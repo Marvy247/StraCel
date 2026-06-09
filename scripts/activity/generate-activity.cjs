@@ -10,6 +10,7 @@ const { deriveAccounts, getMasterWallet, CONTRACT_ADDRESSES, ABIS, NUM_ACCOUNTS,
 
 const RPCS = ["https://forno.celo.org", "https://rpc.ankr.com/celo", "https://celo.drpc.org"];
 const BATCH_SIZE = 10; // wallets per run
+const EXPLORER = "https://explorer.celo.org/mainnet/tx";
 
 async function withRetry(fn) {
   for (const rpc of RPCS) {
@@ -54,7 +55,7 @@ async function runWallet(accounts, idx) {
     console.log(`[${wallet.address.slice(0, 10)}] UserProfile.registerUser`);
     try {
       const tx = await contract.registerUser(`user${rand()}`, `Bio ${rand()}`, `${rand()}@test.com`);
-      console.log(`  ✅ https://explorer.celo.org/mainnet/tx/${tx.hash}`);
+      console.log(`  ✅ ${EXPLORER}/${tx.hash}`);
       await tx.wait();
     } catch (e) {
       const msg = e.message ?? '';
