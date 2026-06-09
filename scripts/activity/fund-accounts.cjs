@@ -1,42 +1,60 @@
 #!/usr/bin/env node
 /**
- * Fund 100 derived accounts from master wallet
+ * Fund 99 derived accounts evenly from master wallet (account 0).
+ * Keeps 2 CELO on master for gas, splits the rest equally.
  * Usage: node scripts/activity/fund-accounts.cjs
- * Requires MNEMONIC in .env
  */
 const { ethers } = require("ethers");
-const { getProvider, deriveAccounts, getMasterWallet, NUM_ACCOUNTS, sleep } = require("./config.cjs");
+const { getWorkingProvider, withRpcFallback, deriveAccounts, getMasterWallet, NUM_ACCOUNTS, sleep } = require("./config.cjs");
 
-const FUND_AMOUNT = ethers.parseEther("0.05"); // 0.05 CELO each = 5 CELO total
-const MIN_BALANCE = ethers.parseEther("0.02");
+const MASTER_RESERVE = ethers.parseEther("2");
+
+async function getBalance(address) {
+  return withRpcFallback(p => p.getBalance(address));
+}
 
 async function main() {
-  const provider = getProvider();
+  const provider = await getWorkingProvider();
   const master = getMasterWallet(provider);
   const accounts = deriveAccounts(provider);
 
-  const masterBal = await provider.getBalance(master.address);
+  const masterBal = await getBalance(master.address);
   console.log(`Master: ${master.address} — ${ethers.formatEther(masterBal)} CELO\n`);
+
+  const targets = accounts.slice(1); // accounts 1–99
+
+  let existingTotal = 0n;
+  const balances = [];
+  for (const acc of targets) {
+    const bal = await getBalance(acc.address);
+    balances.push(bal);
+    existingTotal += bal;
+    await sleep(100);
+  }
+
+  const distributable = masterBal + existingTotal - MASTER_RESERVE;
+  const targetPerAccount = distributable / BigInt(targets.length);
+
+  console.log(`Distributable: ${ethers.formatEther(distributable)} CELO`);
+  console.log(`Target per account: ${ethers.formatEther(targetPerAccount)} CELO\n`);
 
   let nonce = await provider.getTransactionCount(master.address);
 
-  for (let i = 0; i < NUM_ACCOUNTS; i++) {
-    const addr = accounts[i].address;
-    const bal = await provider.getBalance(addr);
-    if (bal >= MIN_BALANCE) {
-      console.log(`Account ${i}: ${addr} — ${ethers.formatEther(bal)} CELO OK`);
+  for (let i = 0; i < targets.length; i++) {
+    const addr = targets[i].address;
+    const current = balances[i];
+    if (current >= targetPerAccount) {
+      console.log(`Account ${i + 1}: ${addr} — ${ethers.formatEther(current)} CELO OK`);
       continue;
     }
-
-    const tx = await master.sendTransaction({
-      to: addr,
-      value: FUND_AMOUNT,
-      nonce: nonce++,
-    });
-    console.log(`✅ Account ${i}: ${addr} — funded 0.05 CELO (${tx.hash})`);
-    await sleep(500);
+    const topUp = targetPerAccount - current;
+    const tx = await master.sendTransaction({ to: addr, value: topUp, nonce: nonce++ });
+    console.log(`✅ Account ${i + 1}: ${addr} — +${ethers.formatEther(topUp)} CELO → ${tx.hash}`);
+    await sleep(300);
   }
-  console.log("\nDone!");
+
+  const finalBal = await getBalance(master.address);
+  console.log(`\nMaster remaining: ${ethers.formatEther(finalBal)} CELO\nDone!`);
 }
 
 main().catch(e => { console.error(e.message); process.exit(1); });
