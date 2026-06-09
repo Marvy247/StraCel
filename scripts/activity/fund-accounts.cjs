@@ -8,6 +8,7 @@ const { ethers } = require("ethers");
 const { getWorkingProvider, withRpcFallback, deriveAccounts, getMasterWallet, NUM_ACCOUNTS, sleep } = require("./config.cjs");
 
 const MASTER_RESERVE = ethers.parseEther("2");
+const MIN_TOPUP = ethers.parseEther("0.001"); // skip dust top-ups
 
 async function getBalance(address) {
   return withRpcFallback(p => p.getBalance(address));
@@ -43,11 +44,14 @@ async function main() {
   for (let i = 0; i < targets.length; i++) {
     const addr = targets[i].address;
     const current = balances[i];
-    if (current >= targetPerAccount) {
-      console.log(`Account ${i + 1}: ${addr} — ${ethers.formatEther(current)} CELO OK`);
+    if (current >= targetPerAccount) {      console.log(`Account ${i + 1}: ${addr} — ${ethers.formatEther(current)} CELO OK`);
       continue;
     }
     const topUp = targetPerAccount - current;
+    if (topUp < MIN_TOPUP) {
+      console.log(`Account ${i + 1}: ${addr} — skipping dust top-up (${ethers.formatEther(topUp)} CELO)`);
+      continue;
+    }
     const tx = await master.sendTransaction({ to: addr, value: topUp, nonce: nonce++ });
     console.log(`✅ Account ${i + 1}: ${addr} — +${ethers.formatEther(topUp)} CELO → ${tx.hash}`);
     await sleep(300);
