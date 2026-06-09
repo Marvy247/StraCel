@@ -1,68 +1,94 @@
 #!/usr/bin/env node
 /**
  * Celo Activity Generator — interacts with deployed Strade contracts
- * Rotates through 100 accounts making contract calls each run
+ * One wallet per run, rotated by minute across 100 derived accounts.
  * Usage: node scripts/activity/generate-activity.cjs
  * Requires MNEMONIC in .env
  */
 const { ethers } = require("ethers");
-const { getProvider, deriveAccounts, CONTRACT_ADDRESSES, ABIS, NUM_ACCOUNTS, rand, sleep } = require("./config.cjs");
+const { deriveAccounts, getMasterWallet, CONTRACT_ADDRESSES, ABIS, NUM_ACCOUNTS, rand, sleep } = require("./config.cjs");
 
-const DRY_RUN = false;
-const GAS_PRICE = ethers.parseUnits("10", "gwei"); // elevated for Talent Protocol ranking
+const RPCS = ["https://forno.celo.org", "https://rpc.ankr.com/celo", "https://celo.drpc.org"];
+const BATCH_SIZE = 10; // wallets per run
 
-async function sendTx(wallet, contractName, fn, args, value = 0n) {
+async function withRetry(fn) {
+  for (const rpc of RPCS) {
+    try { return await fn(rpc); } catch (e) {
+      console.warn(`  ⚠ ${rpc}: ${e.shortMessage ?? e.message?.slice(0, 60)}`);
+    }
+  }
+  throw new Error("All RPCs failed");
+}
+
+async function sendTx(wallet, contractName, fn, args, value) {
   const contract = new ethers.Contract(CONTRACT_ADDRESSES[contractName], ABIS[contractName], wallet);
-  console.log(`[${wallet.address.slice(0,8)}] ${contractName}.${fn}`);
-  if (DRY_RUN) { console.log("  DRY-RUN: skipped"); return; }
+  console.log(`[${wallet.address.slice(0, 10)}] ${contractName}.${fn}`);
   try {
-    const tx = await contract[fn](...args, { gasPrice: GAS_PRICE, ...(value ? { value } : {}) });
-    console.log(`  ✅ ${tx.hash}`);
+    const overrides = value ? { value } : {};
+    const tx = await contract[fn](...args, overrides);
+    console.log(`  ✅ https://explorer.celo.org/mainnet/tx/${tx.hash}`);
+    await sleep(2000);
   } catch (e) {
-    console.error(`  ❌ ${e.message?.slice(0, 80)}`);
+    console.error(`  ❌ ${e.shortMessage ?? e.message?.slice(0, 80)}`);
   }
 }
 
-async function main() {
-  const provider = getProvider();
-  const accounts = deriveAccounts(provider);
+async function runWallet(accounts, idx) {
+  const provider = new ethers.JsonRpcProvider(RPCS[0], 42220);
+  const wallet = accounts[idx].connect(provider);
 
-  // Check balances and filter usable accounts
-  console.log("Checking accounts...\n");
-  const active = [];
-  for (let i = 0; i < NUM_ACCOUNTS; i++) {
-    const bal = await provider.getBalance(accounts[i].address);
-    if (bal >= ethers.parseEther("0.01")) active.push(accounts[i]);
-    await sleep(200);
+  console.log(`\n[${new Date().toISOString()}] Wallet [${idx}]: ${wallet.address}`);
+
+  const balance = await provider.getBalance(wallet.address);
+  if (balance < ethers.parseEther("0.01")) {
+    console.log(`  ⚠️  Low balance (${ethers.formatEther(balance)} CELO) — skipping`);
+    return;
   }
-  console.log(`Using ${active.length}/${NUM_ACCOUNTS} funded accounts\nDRY_RUN=${DRY_RUN}\n`);
-  if (active.length === 0) { console.log("No funded accounts. Run fund-accounts.cjs first."); return; }
 
-  // One call per account, rotating through different contract functions
-  const calls = [
-    (w, i) => sendTx(w, "UserProfile", "updateProfile", [`Bio ${rand()}`, `${rand()}@test.com`]),
-    (w, i) => sendTx(w, "CoreMarketPlace", "createListing", [`Item ${rand()}`, `Desc ${rand()}`, ethers.parseEther("0.01"), 1000n]),
-    (w, i) => sendTx(w, "CoreMarketPlace", "updateListing", [1n, ethers.parseEther("0.02"), `Updated ${rand()}`]),
-    (w, i) => sendTx(w, "UserProfile", "rateUser", [active[(i + 1) % active.length].address, BigInt(Math.floor(Math.random() * 5) + 1)]),
-    (w, i) => sendTx(w, "UserProfile", "calculateReputation", [w.address]),
-    (w, i) => sendTx(w, "EscrowService", "createEscrow", [active[(i + 1) % active.length].address], ethers.parseEther("0.005")),
-  ];
-
-  // Ensure all accounts are registered first
-  const userProfile = new ethers.Contract(CONTRACT_ADDRESSES.UserProfile, ABIS.UserProfile, provider);
-  for (let i = 0; i < active.length; i++) {
-    const isReg = await userProfile.registered(active[i].address);
-    if (!isReg) {
-      await sendTx(active[i], "UserProfile", "registerUser", [`user${rand()}`, `Bio ${rand()}`, `${rand()}@test.com`]);
-      await sleep(1000);
+  const isReg = await withRetry(rpc =>
+    new ethers.Contract(CONTRACT_ADDRESSES.UserProfile, ABIS.UserProfile, new ethers.JsonRpcProvider(rpc, 42220))
+      .registered(wallet.address)
+  );
+  if (!isReg) {
+    const contract = new ethers.Contract(CONTRACT_ADDRESSES.UserProfile, ABIS.UserProfile, wallet);
+    console.log(`[${wallet.address.slice(0, 10)}] UserProfile.registerUser`);
+    try {
+      const tx = await contract.registerUser(`user${rand()}`, `Bio ${rand()}`, `${rand()}@test.com`);
+      console.log(`  ✅ https://explorer.celo.org/mainnet/tx/${tx.hash}`);
+      await tx.wait();
+    } catch (e) {
+      const msg = e.message ?? '';
+      if (!msg.includes('AlreadyRegistered') && !msg.includes('nonce has already been used')) {
+        console.error(`  ❌ ${e.shortMessage ?? msg.slice(0, 80)}`);
+        return;
+      }
     }
   }
 
-  for (let i = 0; i < active.length; i++) {
-    await calls[i % calls.length](active[i], i);
+  const neighbor = accounts[(idx + 1) % NUM_ACCOUNTS].address;
+  const actions = [
+    () => sendTx(wallet, "UserProfile", "updateProfile", [`Bio ${rand()}`, `${rand()}@test.com`]),
+    () => sendTx(wallet, "CoreMarketPlace", "createListing", [`Item ${rand()}`, `Desc ${rand()}`, ethers.parseEther("0.01"), 1000n]),
+    () => sendTx(wallet, "UserProfile", "rateUser", [neighbor, BigInt(Math.floor(Math.random() * 5) + 1)]),
+    () => sendTx(wallet, "UserProfile", "calculateReputation", [wallet.address]),
+    () => sendTx(wallet, "EscrowService", "createEscrow", [neighbor], ethers.parseEther("0.005")),
+  ];
+  await actions[idx % actions.length]();
+}
+
+async function main() {
+  const provider = new ethers.JsonRpcProvider(RPCS[0], 42220);
+  const accounts = deriveAccounts(provider);
+
+  // Run a batch of BATCH_SIZE wallets, offset rotating by run
+  const startIndex = (Math.floor(Date.now() / 1000 / 60) * BATCH_SIZE) % NUM_ACCOUNTS;
+  const indices = Array.from({ length: BATCH_SIZE }, (_, i) => (startIndex + i) % NUM_ACCOUNTS);
+
+  console.log(`Running wallets [${indices[0]}–${indices[indices.length - 1]}]`);
+  for (const idx of indices) {
+    await runWallet(accounts, idx);
     await sleep(500);
   }
-
   console.log("\nDone!");
 }
 
