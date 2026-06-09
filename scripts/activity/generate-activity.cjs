@@ -39,11 +39,20 @@ async function runWallet(accounts, idx) {
   const wallet = accounts[idx].connect(provider);
 
   console.log(`\n[${new Date().toISOString()}] Wallet [${idx}]: ${wallet.address}`);
-  console.log(`  Balance: ${ethers.formatEther(balance)} CELO`);
 
-  const balance = await provider.getBalance(wallet.address);
+  let balance;
+  try {
+    balance = await withRetry(rpc =>
+      new ethers.JsonRpcProvider(rpc, 42220).getBalance(wallet.address)
+    );
+  } catch (e) {
+    console.error(`  ❌ Could not fetch balance: ${e.message?.slice(0, 60)}`);
+    return;
+  }
+
+  console.log(`  Balance: ${ethers.formatEther(balance)} CELO`);
   if (balance < ethers.parseEther("0.01")) {
-    console.log(`  ⚠️  Low balance (${ethers.formatEther(balance)} CELO) — skipping`);
+    console.log(`  ⚠️  Low balance — skipping`);
     return;
   }
 
