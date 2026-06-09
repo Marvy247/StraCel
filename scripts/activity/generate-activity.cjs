@@ -39,6 +39,7 @@ async function runWallet(accounts, idx) {
   const wallet = accounts[idx].connect(provider);
 
   console.log(`\n[${new Date().toISOString()}] Wallet [${idx}]: ${wallet.address}`);
+  console.log(`  Balance: ${ethers.formatEther(balance)} CELO`);
 
   const balance = await provider.getBalance(wallet.address);
   if (balance < ethers.parseEther("0.01")) {
