@@ -91,7 +91,7 @@ async function main() {
     await runWallet(accounts, idx);
     await sleep(500);
   }
-  console.log("\nDone!");
+  console.log(`\nDone! ${indices.length} wallets processed.`);
 }
 
 main().catch(e => { console.error(e.message); process.exit(1); });
