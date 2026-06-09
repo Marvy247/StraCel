@@ -30,7 +30,7 @@ async function sendTx(wallet, contractName, fn, args, value) {
     console.log(`  ✅ https://explorer.celo.org/mainnet/tx/${tx.hash}`);
     await sleep(2000);
   } catch (e) {
-    console.error(`  ❌ ${e.shortMessage ?? e.message?.slice(0, 80)}`);
+    console.error(`  ❌ [${contractName}.${fn}] ${e.shortMessage ?? e.message?.slice(0, 80)}`);
   }
 }
 
