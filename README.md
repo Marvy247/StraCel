@@ -71,3 +71,12 @@ node scripts/activity/drain-accounts.cjs
 - Hardhat
 - OpenZeppelin Contracts
 - Celo Blockchain
+
+## Auto Activity
+
+```bash
+# Run continuously, cycling through all 100 wallets every 30 minutes
+bash scripts/activity/auto-activity.sh
+```
+
+Logs are written to `activity.log` in the project root.
