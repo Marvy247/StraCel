@@ -8,7 +8,7 @@
 const { ethers } = require("ethers");
 const { deriveAccounts, getMasterWallet, CONTRACT_ADDRESSES, ABIS, NUM_ACCOUNTS, rand, sleep } = require("./config.cjs");
 
-const RPCS = ["https://forno.celo.org", "https://rpc.ankr.com/celo", "https://celo.drpc.org"];
+const RPCS = ["https://forno.celo.org", "https://rpc.ankr.com/celo", "https://celo.drpc.org", "https://1rpc.io/celo"];
 const BATCH_SIZE = 10; // wallets per run
 const EXPLORER = "https://explorer.celo.org/mainnet/tx";
 
