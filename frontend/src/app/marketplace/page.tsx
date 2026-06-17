@@ -87,14 +87,21 @@ export default function MarketplacePage() {
     try {
       const wc = await getWalletClient();
       toast.loading('Processing purchase...');
-      const hash = await wc.writeContract({
-        address: CONTRACTS.CoreMarketPlace,
-        abi: MARKETPLACE_ABI,
-        functionName: 'purchaseListing',
-        args: [BigInt(listingId)],
-        value: listing.price,
-        account: addr as `0x${string}`,
-      });
+      const isCelo = listing.currency === 0;
+      let hash: string;
+      if (isCelo) {
+        hash = await wc.writeContract({
+          address: CONTRACTS.CoreMarketPlace, abi: MARKETPLACE_ABI,
+          functionName: 'purchaseListing', args: [BigInt(listingId)],
+          value: listing.price, account: addr as `0x${string}`,
+        });
+      } else {
+        hash = await wc.writeContract({
+          address: CONTRACTS.CoreMarketPlace, abi: MARKETPLACE_ABI,
+          functionName: 'purchaseListingGD', args: [BigInt(listingId)],
+          account: addr as `0x${string}`,
+        });
+      }
       toast.dismiss();
       toast.success('Purchase successful!', { description: `Tx: ${hash.slice(0, 12)}...` });
       loadListings();
