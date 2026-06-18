@@ -2,22 +2,18 @@
 
 ## What is Stracel?
 
-Stracel is a fully decentralized peer-to-peer marketplace built on the Celo blockchain. It enables anyone to list, buy, and sell goods and services using CELO or G$ (GoodDollar) — with no middlemen, no platform fees, and no censorship.
-
-Smart contracts handle payments directly between buyers and sellers, with every transaction recorded on-chain for full transparency.
+Stracel is a fully decentralized P2P marketplace on Celo. Anyone can list, buy, and sell goods using CELO or G$ — no middlemen, no fees, no censorship. Smart contracts handle payments directly between buyers and sellers, recorded on-chain.
 
 ## G$ Integration
 
-Stracel natively supports G$ as a payment currency alongside CELO. Sellers can price listings in G$, and buyers can purchase using either CELO or G$ — including cross-currency purchases (e.g., buying a G$-priced item with CELO). The smart contract handles G$ transfers via `safeTransferFrom` with a full approval flow in the frontend.
-
-This makes Stracel a direct driver of G$ usage and circulation on Celo, turning everyday commerce into a vector for GoodDollar adoption.
+G$ is a first-class currency alongside CELO. Sellers price listings in G$, buyers can purchase with CELO or G$ (cross-currency). The frontend handles the full G$ approval flow (allowance check → approve → purchaseListingGD). This gives G$ real economic utility beyond holding.
 
 ## How It Works
 
-1. **Connect** your Celo wallet (MetaMask or any EVM-compatible wallet)
-2. **List** an item — set a name, description, price (in CELO or G$), and duration
-3. **Buy** — payment is sent directly to the seller via smart contract. Track your order in My Orders with a verifiable transaction on Celo Explorer
-4. **Manage** — sellers can edit or remove their listings at any time
+1. **Connect** your Celo wallet (MetaMask or any EVM wallet)
+2. **List** an item — name, description, price (CELO or G$), duration
+3. **Buy** — payment goes directly to seller via smart contract. Track in My Orders with an on-chain verification link
+4. **Manage** — sellers can edit or remove listings anytime
 
 ## Smart Contracts (Celo Mainnet)
 
@@ -29,72 +25,42 @@ This makes Stracel a direct driver of G$ usage and circulation on Celo, turning 
 | UserProfile | `0x7DaE559f4acE0579121C22de722d1E97A6957069` |
 | G$ Token | `0x62B8B11039FcfE5aB0C56E502b1C372A3d2a9c7A` |
 
-All contracts are live on Celo mainnet and actively receiving transactions.
-
 ## Tech Stack
 
-- **Solidity 0.8.24** — smart contracts with OpenZeppelin
-- **Celo Blockchain** — fast, mobile-first, low-fee EVM chain
-- **Next.js + viem** — frontend with direct Celo contract interaction
-- **G$ (GoodDollar)** — integrated as native payment currency with cross-currency support
+Solidity 0.8.24 + OpenZeppelin, Celo blockchain, Next.js + viem, G$ (GoodDollar).
 
-## What's the Current State of the Project?
+## What's the Current State?
 
 ### Progress Made
 
-Stracel is live on Celo mainnet with 5 core smart contracts deployed:
+Stracel is live on Celo mainnet with 5 contracts deployed:
 
-- **CoreMarketPlace** — fully functional with dual-currency support (CELO + G$). Sellers can price listings in either currency, buyers can purchase with either currency. Cross-currency purchases supported.
-- **EscrowService** — trustless escrow for high-value transactions.
-- **DisputeResolution** — community arbitration contract.
-- **UserProfile** — on-chain registration and reputation scoring.
-- **Frontend** — Next.js marketplace UI built with viem, connected directly to Celo mainnet contracts. Wallet connect, listing creation, purchasing (with G$ approval flow), cancellation, editing, order history, transaction tracking, search, filter, and pagination all functional.
+- **CoreMarketPlace** — dual-currency listings + purchases, cross-currency support, edit/remove
+- **EscrowService** — trustless escrow for high-value transactions
+- **DisputeResolution** — community arbitration with 24h voting
+- **UserProfile** — on-chain registration and reputation scoring
+- **Frontend** — full Next.js UI: wallet connect, create/buy/cancel/edit listings, G$ approval flow, order history, transaction tracker (real-time polling), notifications, search, filter, sort, pagination, wallet balances (CELO + G$), gas estimation, "already bought" detection, confirm dialog with clear purchase breakdown
 
 ### Milestones Completed
 
 - ✅ All contracts deployed to Celo mainnet
-- ✅ G$ integration: contract supports G$ listings, G$ purchases, cross-currency (buy G$ items with CELO)
-- ✅ G$ approval flow in frontend — allowance check + approve + purchaseListingGD
-- ✅ Frontend: Next.js with full marketplace UI
-- ✅ Listing detail page with confirm dialog, "already bought" detection, order tracking
-- ✅ Persistent transaction tracker with real-time polling
-- ✅ Push notification system for purchase and listing events
-- ✅ Wallet balances (CELO + G$) in header
-- ✅ Gas estimation shown before confirm
-- ✅ Search, filter (currency + price range), sorting, pagination
-- ✅ Edit/Remove listings for sellers
-- ✅ Order history with on-chain verification links
+- ✅ G$ integration: G$ listings, G$ purchases, cross-currency (buy G$ items with CELO), full approval flow
+- ✅ 12 active listings (CELO + G$) on mainnet — electronics, collectibles, home goods, Digital Art NFT
+- ✅ Complete frontend with all marketplace features
+- ✅ Edit/remove listings for sellers
+- ✅ Transaction tracker, notifications, order history with on-chain verification
+- ✅ 100-wallet activity system generating real on-chain transactions
 
-### What We've Been Up To
+### What's Next
 
-The last sprint focused on two things: getting G$ working end-to-end, and fixing the UX issues identified in testing feedback.
-
-**G$ Integration:**
-- Deployed a new CoreMarketPlace with currency checks removed so buyers can purchase G$-denominated listings with CELO (cross-currency)
-- Added approval flow (allowance check → approve → purchaseListingGD) so G$ purchases work correctly
-- Currency selector in both marketplace and detail-page confirm dialogs lets buyers choose payment currency
-
-**UX Overhaul:**
-- Added a confirm dialog on the listing detail page showing a clear breakdown of the purchase (item, price, seller, where money goes)
-- "Already bought" detection prevents double-purchases and shows a green confirmation banner
-- Order history page now explains where money went and links to Celo Explorer for on-chain verification
-- Transaction tracker (bottom-right panel) polls every 3s so users see real-time status of their purchases
-- Notification system (bell icon) alerts on purchase, listing creation, and cancellation events
-
-### Current Status
-
-The marketplace currently has **12 active listings** across CELO and G$ — including electronics, collectibles, home goods, and a Digital Art NFT priced in G$. All are real, buyable listings on Celo mainnet.
-
-### What We're Working On Next
-
-- **Frontend deployment** to a public URL for easy access
-- **Mobile optimization** for Celo's mobile-first user base
-- **Escrow integration** in the CoreMarketPlace UI for optional buyer protection
-- **Community growth** — getting real users listing and trading on the platform
+- Frontend deployment to a public URL
+- Mobile optimization for Celo's mobile-first base
+- Escrow integration in the CoreMarketPlace UI
+- Community growth and real user adoption
 
 ## Why Stracel for GoodBuilders?
 
-G$ is a universal basic income token — Stracel gives it a place to be spent. Every listing priced in G$, every cross-currency purchase that uses G$, is a real-world use case that gives the token economic utility beyond holding. We're building the commerce layer that G$ needs.
+G$ is a UBI token — Stracel gives it a place to be spent. Every G$-priced listing and cross-currency purchase drives real economic utility. We're building the commerce layer G$ needs.
 
 ## Links
 
