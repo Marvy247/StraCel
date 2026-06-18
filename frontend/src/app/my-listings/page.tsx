@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import TestnetBanner from '@/components/TestnetBanner';
 import ListingCard from '@/components/ListingCard';
 import { ListingGridSkeleton } from '@/components/LoadingSkeleton';
-import { getListings, Listing, CONTRACTS, MARKETPLACE_ABI, getConnectedAddress, connectWallet } from '@/lib/celo';
+import { getAllListings, Listing, CONTRACTS, MARKETPLACE_ABI, getConnectedAddress, connectWallet } from '@/lib/celo';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,8 +40,7 @@ export default function MyListings() {
 
   const loadMyListings = async (address: string) => {
     try {
-      const all = await getListings();
-      // getListings returns only active — fetch all by checking lastListingId
+      const all = await getAllListings();
       setListings(all.filter(l => l.seller.toLowerCase() === address.toLowerCase()));
     } catch {
       toast.error('Failed to load listings');

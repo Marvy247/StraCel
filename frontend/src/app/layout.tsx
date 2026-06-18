@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { TxTrackerProvider } from "@/lib/transactionTracker";
+import TransactionPanel from "@/components/TransactionPanel";
 
 export const metadata: Metadata = {
   title: "Stracel - Decentralized Marketplace on Celo",
@@ -32,11 +34,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster position="top-right" richColors />
+          <TxTrackerProvider>
+            {children}
+            <TransactionPanel />
+            <Toaster position="top-right" richColors />
+          </TxTrackerProvider>
         </ThemeProvider>
       </body>
     </html>
   );
 }
-// NotificationPanel

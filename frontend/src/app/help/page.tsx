@@ -10,19 +10,19 @@ export default function HelpPage() {
   const faqs = [
     {
       question: 'What is Stracel?',
-      answer: 'Stracel is a decentralized marketplace built on the Stacks blockchain. It allows users to buy and sell goods securely using smart contracts, without the need for intermediaries.',
+      answer: 'Stracel is a decentralized marketplace built on the Celo blockchain. It allows users to buy and sell goods securely using smart contracts, without the need for intermediaries.',
     },
     {
       question: 'How do I connect my wallet?',
-      answer: 'Click the "Connect Wallet" button in the header. You\'ll need a Stacks wallet like Hiro Wallet or Leather to interact with the marketplace.',
+      answer: 'Click the "Connect Wallet" button in the header. You\'ll need a Celo-compatible wallet like MetaMask to interact with the marketplace. Make sure you are on the Celo Mainnet network.',
     },
     {
       question: 'How do I create a listing?',
-      answer: 'Once your wallet is connected, click the "Create Listing" button on the marketplace page. Fill in the item details including name, description, price (in STX), and duration (in days). You can also upload an image to make your listing more attractive.',
+      answer: 'Once your wallet is connected, click the "Create Listing" button on the marketplace page. Fill in the item details including name, description, price (in CELO or G$), and duration (in days). You can also upload an image to make your listing more attractive.',
     },
     {
       question: 'How do purchases work?',
-      answer: 'When you click "Purchase" on a listing, a transaction will be initiated through your wallet. The STX amount will be transferred directly from your wallet to the seller. Once confirmed on the blockchain, the listing status will update to "sold".',
+      answer: 'When you click "Buy with CELO" or "Buy with G$" on a listing, you will first see a confirmation screen showing exactly what you are buying and how much you will pay. The funds are sent directly to the seller via smart contract. Once confirmed on the blockchain, the purchase is recorded in your Order History.',
     },
     {
       question: 'Can I cancel my listing?',
@@ -30,25 +30,33 @@ export default function HelpPage() {
     },
     {
       question: 'What happens when a listing expires?',
-      answer: 'Listings have a duration set by the seller. When this time passes, the listing automatically expires and can no longer be purchased. Expired listings can be viewed in the seller\'s "My Listings" page.',
+      answer: 'Listings have a duration set by the seller (measured in Celo blocks). When this time passes, the listing automatically expires and can no longer be purchased. Expired listings can be viewed in the seller\'s "My Listings" page.',
     },
     {
-      question: 'Is this real money?',
-      answer: 'Currently, Stracel is running on the Stacks testnet. The STX tokens used have no real value and are only for testing purposes. DO NOT use real assets on the testnet.',
+      question: 'Where does my money go when I buy?',
+      answer: 'When you make a purchase, your CELO or G$ is sent directly to the seller\'s wallet via the smart contract. The transaction is recorded on-chain and appears in your Order History page so you always know where your funds went.',
+    },
+    {
+      question: 'What is G$ (GoodDollar)?',
+      answer: 'G$ is a stablecoin on Celo that maintains a stable value. Stracel supports both CELO and G$ for listing and purchasing items. When buying with G$, you will need to approve the marketplace contract to spend your G$ tokens (this is handled automatically during purchase).',
     },
     {
       question: 'What are gas fees?',
-      answer: 'Gas fees are transaction costs paid to process your transaction on the blockchain. These fees go to network miners, not to Stracel. Your wallet will show you the estimated fee before you confirm any transaction.',
+      answer: 'Gas fees are small transaction costs paid to process your transaction on the Celo blockchain. These fees are denominated in CELO and are very low compared to other blockchains. Your wallet will show you the estimated fee before you confirm any transaction.',
+    },
+    {
+      question: 'Is this real money?',
+      answer: 'Stracel is deployed on Celo Mainnet. All transactions use real CELO and G$ tokens. Please use caution and only transact with trusted parties.',
     },
   ];
 
   const safetyTips = [
     'Always verify the seller\'s address before making a purchase',
-    'Check the listing expiration date to ensure sufficient time for transaction',
-    'Make sure you have enough STX balance including gas fees',
+    'Check the listing expiration block to ensure it is still active',
+    'Make sure you have enough CELO for gas fees and the purchase amount',
     'Never share your private keys or seed phrase with anyone',
     'Double-check all transaction details before confirming in your wallet',
-    'This is a testnet - never send real STX or valuable assets',
+    'For G$ purchases, ensure you have approved the marketplace contract (handled automatically)',
   ];
 
   return (
@@ -100,9 +108,9 @@ export default function HelpPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-slate-600">
-              <p><strong>1.</strong> Connect your Stacks wallet</p>
+              <p><strong>1.</strong> Connect your Celo wallet (MetaMask)</p>
               <p><strong>2.</strong> Click "Create Listing"</p>
-              <p><strong>3.</strong> Fill in item details and set price</p>
+              <p><strong>3.</strong> Fill in item details, set price in CELO or G$</p>
               <p><strong>4.</strong> Confirm transaction in wallet</p>
               <p><strong>5.</strong> Manage listings in "My Listings"</p>
             </CardContent>
@@ -116,11 +124,11 @@ export default function HelpPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-slate-600">
-              <p><strong>1.</strong> Connect your Stacks wallet</p>
+              <p><strong>1.</strong> Connect your Celo wallet (MetaMask)</p>
               <p><strong>2.</strong> Browse available listings</p>
-              <p><strong>3.</strong> Check price and seller details</p>
-              <p><strong>4.</strong> Click "Purchase" and confirm</p>
-              <p><strong>5.</strong> Wait for blockchain confirmation</p>
+              <p><strong>3.</strong> Review item, price, and seller details</p>
+              <p><strong>4.</strong> Click "Buy with CELO" or "Buy with G$" and confirm</p>
+              <p><strong>5.</strong> View the purchase in "My Orders" history</p>
             </CardContent>
           </Card>
         </div>
@@ -153,7 +161,7 @@ export default function HelpPage() {
           <CardContent className="space-y-2 text-sm text-slate-600">
             <p>For technical issues or questions not covered here:</p>
             <ul className="list-disc list-inside space-y-1 ml-2">
-              <li>Check the Stacks blockchain explorer for transaction status</li>
+              <li>Check the Celo blockchain explorer (explorer.celo.org) for transaction status</li>
               <li>Visit our GitHub repository for technical documentation</li>
               <li>Join our community Discord for support</li>
             </ul>

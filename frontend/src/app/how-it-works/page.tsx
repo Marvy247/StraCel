@@ -26,10 +26,10 @@ const steps = [
   {
     icon: Wallet,
     title: 'Connect Your Wallet',
-    description: 'Connect your Leather wallet or any Stacks-compatible wallet to get started. No sign-up required.',
+    description: 'Connect your MetaMask wallet or any Celo-compatible wallet to get started. No sign-up required.',
     details: [
-      'Install Leather wallet extension',
-      'Create or import your wallet',
+      'Install MetaMask or any Celo-compatible wallet',
+      'Add Celo Mainnet to your wallet (auto-detected)',
       'Connect to Stracel with one click',
       'Your wallet, your keys, your control'
     ]
@@ -37,31 +37,32 @@ const steps = [
   {
     icon: List,
     title: 'Create a Listing',
-    description: 'List your items with detailed descriptions, prices, and durations. All transactions are protected by smart contracts.',
+    description: 'List your items with detailed descriptions, prices, and durations. Support both CELO and G$ currencies.',
     details: [
       'Add item name and description',
-      'Set your price in STX',
-      'Choose listing duration',
-      'Submit transaction to blockchain'
+      'Set your price in CELO or G$',
+      'Choose listing duration (in days)',
+      'Submit transaction to the Celo blockchain'
     ]
   },
   {
     icon: ShoppingCart,
     title: 'Browse & Purchase',
-    description: 'Discover items from sellers worldwide. Purchase securely with automatic escrow protection.',
+    description: 'Discover items from sellers worldwide. See exactly what you are buying and where your money goes before confirming.',
     details: [
       'Search and filter listings',
-      'Review seller reputation',
-      'Purchase with one transaction',
-      'Funds held in smart contract escrow'
+      'Review item details and seller info',
+      'Confirm purchase with full transparency',
+      'Funds sent directly to seller via smart contract',
+      'Purchase recorded in your Order History'
     ]
   },
   {
     icon: Shield,
     title: 'Escrow Protection',
-    description: 'All purchases are protected by automatic escrow. Funds are only released when conditions are met.',
+    description: 'Purchases can be protected by automatic escrow. Funds are only released when conditions are met.',
     details: [
-      'Buyer sends STX to escrow',
+      'Buyer sends CELO/G$ to escrow contract',
       'Seller ships the item',
       'Buyer confirms receipt',
       'Funds automatically released to seller'
@@ -80,13 +81,13 @@ const steps = [
   },
   {
     icon: CheckCircle,
-    title: 'Build Reputation',
-    description: 'Rate transactions and build your on-chain reputation. Trust is earned and transparent.',
+    title: 'Track Your Orders',
+    description: 'Every purchase is automatically saved to your personal order history so you always know what you bought and where your funds went.',
     details: [
-      'Rate each transaction',
-      'Receive ratings from others',
-      'Reputation stored on-chain',
-      'Build trust with the community'
+      'Automatic order recording after purchase',
+      'View transaction hash and block explorer link',
+      'See seller address and amount paid',
+      'Full audit trail of all your purchases'
     ]
   }
 ];

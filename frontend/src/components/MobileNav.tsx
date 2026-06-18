@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Home, Package, HelpCircle } from 'lucide-react';
+import { Menu, X, Home, Package, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function MobileNav() {
@@ -13,9 +13,10 @@ export default function MobileNav() {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const navItems = [
-    { href: '/', label: 'Marketplace', icon: Home },
+    { href: '/', label: 'Home', icon: Home },
+    { href: '/marketplace', label: 'Marketplace', icon: Package },
     { href: '/my-listings', label: 'My Listings', icon: Package },
-    { href: '/help', label: 'Help & FAQ', icon: HelpCircle },
+    { href: '/my-orders', label: 'My Orders', icon: ShoppingBag },
   ];
 
   return (
@@ -54,7 +55,7 @@ export default function MobileNav() {
                     onClick={toggleMenu}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                       isActive
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                        ? 'bg-gradient-to-r from-yellow-500 to-green-500 text-white'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
@@ -70,20 +71,3 @@ export default function MobileNav() {
     </>
   );
 }
-// MobileNav
-// hamburger
-// drawer
-// close
-// links
-// route change
-// wallet
-// theme
-// transition
-// aria
-// focus trap
-// escape key
-// pb-safe
-// render test
-// useMediaQuery
-// lazy
-// active

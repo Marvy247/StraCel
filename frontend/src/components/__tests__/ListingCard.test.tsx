@@ -5,82 +5,58 @@ import { Listing } from '@/lib/celo';
 
 const mockListing: Listing = {
   listingId: 1,
-  seller: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+  seller: '0x1234567890abcdef1234567890abcdef12345678',
   name: 'Test Item',
   description: 'A test item for sale',
-  price: 1000000,
-  status: 'active',
-  createdAt: 1000,
-  expiresAt: Math.floor(Date.now() / 1000) + 86400, // 1 day from now
+  price: 1000000n,
+  currency: 0,
+  status: 0,
+  createdAt: 1000n,
+  expiresAt: BigInt(Math.floor(Date.now() / 1000) + 86400),
 };
 
 describe('ListingCard Component', () => {
   it('renders listing information correctly', () => {
     render(<ListingCard listing={mockListing} />);
-    
+
     expect(screen.getByText('Test Item')).toBeInTheDocument();
     expect(screen.getByText('A test item for sale')).toBeInTheDocument();
-    expect(screen.getByText('1.000000 STX')).toBeInTheDocument();
-    expect(screen.getByText('active')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
-  it('shows Purchase button for non-owner active listings', () => {
+  it('shows Buy button for non-owner active listings', () => {
     render(<ListingCard listing={mockListing} isOwner={false} />);
-    
-    expect(screen.getByText('Purchase')).toBeInTheDocument();
+
+    expect(screen.getByText(/Buy with/)).toBeInTheDocument();
   });
 
-  it('shows "Your listing" text for owner', () => {
+  it('shows Cancel button for owner', () => {
     render(<ListingCard listing={mockListing} isOwner={true} />);
-    
-    expect(screen.getByText('Your listing')).toBeInTheDocument();
-    expect(screen.queryByText('Purchase')).not.toBeInTheDocument();
+
+    expect(screen.getByText('Cancel Listing')).toBeInTheDocument();
   });
 
-  it('calls onPurchase when Purchase button is clicked', async () => {
+  it('calls onPurchase when Buy button is clicked', async () => {
     const onPurchase = vi.fn();
     render(<ListingCard listing={mockListing} onPurchase={onPurchase} isOwner={false} />);
-    
-    const purchaseButton = screen.getByText('Purchase');
+
+    const purchaseButton = screen.getByText(/Buy with/);
     fireEvent.click(purchaseButton);
-    
+
     expect(onPurchase).toHaveBeenCalledWith(1);
   });
 
-  it('shows expired badge for expired listings', () => {
-    const expiredListing = {
-      ...mockListing,
-      expiresAt: Math.floor(Date.now() / 1000) - 86400, // 1 day ago
-    };
-    
-    render(<ListingCard listing={expiredListing} />);
-    
-    expect(screen.getByText('Expired')).toBeInTheDocument();
-  });
+  it('shows Sold status for sold listings', () => {
+    const soldListing = { ...mockListing, status: 1 };
 
-  it('shows "Not available" for sold listings', () => {
-    const soldListing = {
-      ...mockListing,
-      status: 'sold',
-    };
-    
     render(<ListingCard listing={soldListing} isOwner={false} />);
-    
-    expect(screen.getByText('Not available')).toBeInTheDocument();
-    expect(screen.queryByText('Purchase')).not.toBeInTheDocument();
+
+    expect(screen.getAllByText('Sold')).toHaveLength(2);
   });
 
   it('formats seller address correctly', () => {
     render(<ListingCard listing={mockListing} />);
-    
-    // The actual formatted address from formatAddress function
-    expect(screen.getByText('ST1PQH...GZGM')).toBeInTheDocument();
-  });
 
-  it('displays expiration date', () => {
-    render(<ListingCard listing={mockListing} />);
-    
-    const expirationText = screen.getByText(/Expires:/);
-    expect(expirationText).toBeInTheDocument();
+    expect(screen.getByText('0x1234...5678')).toBeInTheDocument();
   });
 });

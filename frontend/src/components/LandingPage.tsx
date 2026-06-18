@@ -14,7 +14,8 @@ import {
   ArrowRight,
   Sparkles,
   Globe,
-  Code
+  Code,
+  ShoppingBag
 } from 'lucide-react';
 
 const fadeInUp = {
@@ -56,6 +57,11 @@ const features = [
     icon: Globe,
     title: 'Decentralized',
     description: 'No middlemen, no censorship, complete ownership of your data'
+  },
+  {
+    icon: ShoppingBag,
+    title: 'Order History',
+    description: 'Every transaction recorded with full details. Always know what you bought, when, and for how much.'
   },
   {
     icon: Code,
@@ -235,23 +241,23 @@ export default function LandingPage() {
             variants={staggerContainer}
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
           >
-            {[
-              {
-                step: '01',
-                title: 'Connect Your Wallet',
-                description: 'Use MetaMask or any Celo-compatible wallet to get started'
-              },
-              {
-                step: '02',
-                title: 'Create or Browse',
-                description: 'List your items or discover what others are selling'
-              },
-              {
-                step: '03',
-                title: 'Trade Securely',
-                description: 'Smart contracts handle escrow and ensure safe transactions'
-              }
-            ].map((item, index) => (
+              {[
+                {
+                  step: '01',
+                  title: 'Connect Your Wallet',
+                  description: 'Use MetaMask or any Celo-compatible wallet to get started. Supports both CELO and G$ payments.'
+                },
+                {
+                  step: '02',
+                  title: 'Browse & Buy',
+                  description: 'Browse listings in CELO or G$, see exactly what you are paying and who the seller is. Funds go directly to the seller via smart contract.'
+                },
+                {
+                  step: '03',
+                  title: 'Track Your Orders',
+                  description: 'Every purchase is recorded in your order history with transaction details. No more wondering where your money went.'
+                }
+              ].map((item, index) => (
               <motion.div
                 key={index}
                 variants={fadeInUp}
@@ -312,11 +318,3 @@ export default function LandingPage() {
     </div>
   );
 }
-// hero responsive
-// flex-col sm:flex-row
-// text-3xl md:text-5xl
-// grid-cols-1 md:grid-cols-3
-// stats mobile
-// overflow-x-auto
-// footer mobile
-// alt texts

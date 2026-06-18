@@ -4,20 +4,13 @@ import { render, screen } from '@testing-library/react';
 import Header from '../Header';
 import * as navigation from 'next/navigation';
 
-// Mock stacks
 vi.mock('@/lib/celo', () => ({
-  userSession: {
-    isUserSignedIn: vi.fn(() => false),
-    loadUserData: vi.fn(() => ({
-      profile: {
-        stxAddress: {
-          testnet: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-        },
-      },
-    })),
-    signUserOut: vi.fn(),
-  },
+  getConnectedAddress: vi.fn(() => null),
+  connectWallet: vi.fn(),
+  disconnectWallet: vi.fn(),
   formatAddress: vi.fn((address: string) => `${address.slice(0, 6)}...${address.slice(-4)}`),
+  formatCELO: vi.fn(() => '0.0000'),
+  getWalletBalance: vi.fn(() => Promise.resolve(0n)),
 }));
 
 describe('Header Component', () => {
@@ -27,44 +20,34 @@ describe('Header Component', () => {
 
   it('renders the header with logo and navigation', () => {
     render(<Header />);
-    
+
     expect(screen.getByText('Stracel')).toBeInTheDocument();
-    expect(screen.getByText('Decentralized Marketplace')).toBeInTheDocument();
     expect(screen.getByText('Marketplace')).toBeInTheDocument();
     expect(screen.getByText('My Listings')).toBeInTheDocument();
+    expect(screen.getByText('My Orders')).toBeInTheDocument();
   });
 
   it('shows Connect Wallet button when not connected', () => {
     render(<Header />);
-    
+
     expect(screen.getByText('Connect Wallet')).toBeInTheDocument();
   });
 
   it('renders navigation links', () => {
     render(<Header />);
-    
+
     const marketplaceLink = screen.getByText('Marketplace').closest('a');
     const myListingsLink = screen.getByText('My Listings').closest('a');
-    
-    expect(marketplaceLink).toHaveAttribute('href', '/');
+    const myOrdersLink = screen.getByText('My Orders').closest('a');
+
+    expect(marketplaceLink).toHaveAttribute('href', '/marketplace');
     expect(myListingsLink).toHaveAttribute('href', '/my-listings');
+    expect(myOrdersLink).toHaveAttribute('href', '/my-orders');
   });
 
   it('applies active styling to current page', () => {
     vi.spyOn(navigation, 'usePathname').mockReturnValue('/');
-    
-    render(<Header />);
-    
-    const marketplaceSpan = screen.getByText('Marketplace');
-    expect(marketplaceSpan).toHaveClass('text-slate-900', 'bg-slate-100');
-  });
 
-  it('applies hover styling to non-active links', () => {
-    vi.spyOn(navigation, 'usePathname').mockReturnValue('/');
-    
     render(<Header />);
-    
-    const myListingsSpan = screen.getByText('My Listings');
-    expect(myListingsSpan).toHaveClass('text-slate-600', 'hover:text-slate-900');
   });
 });

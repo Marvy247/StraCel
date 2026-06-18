@@ -43,7 +43,6 @@ contract CoreMarketPlace is Ownable {
     error ListingExpired();
     error InvalidSeller();
     error InsufficientPayment();
-    error WrongCurrency();
 
     constructor(address _gDollar) Ownable(msg.sender) {
         gDollar = IERC20(_gDollar);
@@ -102,14 +101,13 @@ contract CoreMarketPlace is Ownable {
         emit ListingCancelled(listingId, msg.sender);
     }
 
-    /// @notice Purchase a CELO-priced listing
+    /// @notice Purchase any listing with CELO
     function purchaseListing(uint256 listingId) external payable {
         if (listingId == 0 || listingId > lastListingId) revert ListingNotFound();
         Listing storage listing = listings[listingId];
         if (listing.status != Status.Active) revert NotActive();
         if (block.number > listing.expiresAt) revert ListingExpired();
         if (listing.seller == msg.sender) revert InvalidSeller();
-        if (listing.currency != Currency.CELO) revert WrongCurrency();
         if (msg.value < listing.price) revert InsufficientPayment();
 
         listing.status = Status.Sold;
@@ -119,14 +117,13 @@ contract CoreMarketPlace is Ownable {
         emit ListingPurchased(listingId, msg.sender, listing.seller, listing.price, Currency.CELO);
     }
 
-    /// @notice Purchase a G$-priced listing (buyer must approve this contract first)
+    /// @notice Purchase any listing with G$ (buyer must approve this contract first)
     function purchaseListingGD(uint256 listingId) external {
         if (listingId == 0 || listingId > lastListingId) revert ListingNotFound();
         Listing storage listing = listings[listingId];
         if (listing.status != Status.Active) revert NotActive();
         if (block.number > listing.expiresAt) revert ListingExpired();
         if (listing.seller == msg.sender) revert InvalidSeller();
-        if (listing.currency != Currency.G$) revert WrongCurrency();
 
         listing.status = Status.Sold;
         gDollar.safeTransferFrom(msg.sender, listing.seller, listing.price);

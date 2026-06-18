@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import ImageUpload from '@/components/ImageUpload';
-import { Plus } from 'lucide-react';
+import { Plus, DollarSign, Coins } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface CreateListingFormProps {
   onCreateListing?: (data: {
@@ -15,6 +16,7 @@ interface CreateListingFormProps {
     description: string;
     price: number;
     duration: number;
+    currency: 'CELO' | 'G$';
     imageUrl?: string;
   }) => void;
 }
@@ -28,6 +30,7 @@ export default function CreateListingForm({ onCreateListing }: CreateListingForm
     description: '',
     price: '',
     duration: '',
+    currency: 'CELO' as 'CELO' | 'G$',
     imageUrl: '',
   });
 
@@ -88,11 +91,12 @@ export default function CreateListingForm({ onCreateListing }: CreateListingForm
         description: formData.description,
         price,
         duration,
+        currency: formData.currency,
         imageUrl: formData.imageUrl,
       });
 
       // Reset form and close dialog
-      setFormData({ name: '', description: '', price: '', duration: '', imageUrl: '' });
+      setFormData({ name: '', description: '', price: '', duration: '', currency: 'CELO', imageUrl: '' });
       setErrors({});
       setIsOpen(false);
     } catch (error) {
@@ -172,17 +176,32 @@ export default function CreateListingForm({ onCreateListing }: CreateListingForm
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="price">Price (CELO) *</Label>
-              <Input
-                id="price"
-                type="number"
-                step="0.000001"
-                min="0"
-                value={formData.price}
-                onChange={(e) => handleInputChange('price', e.target.value)}
-                placeholder="0.00"
-                className={errors.price ? 'border-red-500' : ''}
-              />
+              <Label htmlFor="price">Price *</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.000001"
+                  min="0"
+                  value={formData.price}
+                  onChange={(e) => handleInputChange('price', e.target.value)}
+                  placeholder="0.00"
+                  className={errors.price ? 'border-red-500 flex-1' : 'flex-1'}
+                />
+                <Select value={formData.currency} onValueChange={(v: 'CELO' | 'G$') => handleInputChange('currency', v)}>
+                  <SelectTrigger className="w-[100px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CELO">
+                      <Coins className="h-3 w-3 inline mr-1" />CELO
+                    </SelectItem>
+                    <SelectItem value="G$">
+                      <DollarSign className="h-3 w-3 inline mr-1" />G$
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               {errors.price && (
                 <p className="text-xs text-red-500 mt-1">{errors.price}</p>
               )}
@@ -224,8 +243,3 @@ export default function CreateListingForm({ onCreateListing }: CreateListingForm
     </Dialog>
   );
 }
-// w-full
-// flex-col
-// h-12
-// font-size: 16px
-// modal overflow

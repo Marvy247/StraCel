@@ -5,9 +5,10 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { formatAddress, formatCELO, getWalletBalance, connectWallet, disconnectWallet, getConnectedAddress } from '@/lib/celo';
-import { Wallet, LogOut, Copy, CheckCircle2 } from 'lucide-react';
+import { formatAddress, formatCELO, getWalletBalance, getGDBalance, connectWallet, disconnectWallet, getConnectedAddress } from '@/lib/celo';
+import { Wallet, LogOut, Copy, CheckCircle2, RefreshCw, DollarSign } from 'lucide-react';
 import MobileNav from '@/components/MobileNav';
+import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -18,20 +19,32 @@ export default function Header() {
   const pathname = usePathname();
   const [userAddress, setUserAddress] = useState<string>('');
   const [balance, setBalance] = useState<bigint>(0n);
+  const [gdBalance, setGdBalance] = useState<bigint>(0n);
   const [loadingBalance, setLoadingBalance] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const loadBalances = useCallback(async (address: string) => {
+    setLoadingBalance(true);
+    const [celoBal, gdBal] = await Promise.all([
+      getWalletBalance(address),
+      getGDBalance(address),
+    ]);
+    setBalance(celoBal);
+    setGdBalance(gdBal);
+    setLoadingBalance(false);
+  }, []);
 
   const loadUserData = useCallback(() => {
     const address = getConnectedAddress();
     if (address) {
       setUserAddress(address);
-      setLoadingBalance(true);
-      getWalletBalance(address).then(b => { setBalance(b); setLoadingBalance(false); });
+      loadBalances(address);
     } else {
       setUserAddress('');
       setBalance(0n);
+      setGdBalance(0n);
     }
-  }, []);
+  }, [loadBalances]);
 
   useEffect(() => {
     loadUserData();
@@ -61,6 +74,7 @@ export default function Header() {
     { href: '/', label: 'Home' },
     { href: '/marketplace', label: 'Marketplace' },
     { href: '/my-listings', label: 'My Listings' },
+    { href: '/my-orders', label: 'My Orders' },
   ];
 
   return (
@@ -86,6 +100,7 @@ export default function Header() {
 
           <div className="flex items-center gap-2 md:gap-3">
             <ThemeToggle />
+            {userAddress && <NotificationBell />}
             {userAddress ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -109,15 +124,30 @@ export default function Header() {
                       {formatAddress(userAddress)}
                     </p>
                   </div>
-                  <div className="px-2 py-2">
+                  <div className="px-2 py-2 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-slate-600 dark:text-slate-300 font-medium">Balance</span>
-                      <div className="flex items-center gap-1">
-                        <Wallet className="h-3 w-3" />
-                        <span className="text-sm font-medium">
-                          {loadingBalance ? '...' : `${formatCELO(balance)} CELO`}
-                        </span>
+                      <span className="text-sm text-slate-600 dark:text-slate-300 font-medium">Balances</span>
+                      <button onClick={() => loadBalances(userAddress)} className="text-xs text-yellow-600 flex items-center gap-1 cursor-pointer" title="Refresh balances">
+                        <RefreshCw className={`h-3 w-3 ${loadingBalance ? 'animate-spin' : ''}`} />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-700/50 p-2 rounded">
+                      <div className="flex items-center gap-1.5">
+                        <Wallet className="h-3.5 w-3.5 text-yellow-500" />
+                        <span className="text-xs text-slate-500 dark:text-slate-400">CELO</span>
                       </div>
+                      <span className="text-sm font-mono font-medium">
+                        {loadingBalance ? '...' : formatCELO(balance)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-700/50 p-2 rounded">
+                      <div className="flex items-center gap-1.5">
+                        <DollarSign className="h-3.5 w-3.5 text-green-500" />
+                        <span className="text-xs text-slate-500 dark:text-slate-400">G$</span>
+                      </div>
+                      <span className="text-sm font-mono font-medium">
+                        {loadingBalance ? '...' : formatCELO(gdBalance)}
+                      </span>
                     </div>
                   </div>
                   <DropdownMenuSeparator />

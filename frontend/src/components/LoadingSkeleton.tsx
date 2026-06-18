@@ -1,33 +1,41 @@
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 
+function Shimmer({ className }: { className: string }) {
+  return (
+    <div className={`relative overflow-hidden bg-slate-200 dark:bg-slate-700 rounded ${className}`}>
+      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+    </div>
+  );
+}
+
 export function ListingCardSkeleton() {
   return (
     <Card className="h-full flex flex-col animate-pulse">
       <CardHeader>
         <div className="flex items-start justify-between">
-          <div className="h-6 bg-slate-200 rounded w-3/4"></div>
-          <div className="h-6 bg-slate-200 rounded w-16"></div>
+          <Shimmer className="h-6 w-3/4" />
+          <Shimmer className="h-6 w-16" />
         </div>
         <div className="flex items-center space-x-2 mt-2">
-          <div className="h-4 bg-slate-200 rounded w-24"></div>
+          <Shimmer className="h-4 w-24" />
         </div>
       </CardHeader>
 
       <CardContent className="flex-1">
         <div className="space-y-2 mb-4">
-          <div className="h-4 bg-slate-200 rounded w-full"></div>
-          <div className="h-4 bg-slate-200 rounded w-5/6"></div>
-          <div className="h-4 bg-slate-200 rounded w-4/6"></div>
+          <Shimmer className="h-4 w-full" />
+          <Shimmer className="h-4 w-5/6" />
+          <Shimmer className="h-4 w-4/6" />
         </div>
 
         <div className="space-y-2">
-          <div className="h-8 bg-slate-200 rounded w-32"></div>
-          <div className="h-4 bg-slate-200 rounded w-40"></div>
+          <Shimmer className="h-8 w-32" />
+          <Shimmer className="h-4 w-40" />
         </div>
       </CardContent>
 
       <CardFooter>
-        <div className="h-10 bg-slate-200 rounded w-full"></div>
+        <Shimmer className="h-10 w-full" />
       </CardFooter>
     </Card>
   );

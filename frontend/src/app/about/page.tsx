@@ -33,7 +33,7 @@ export default function AboutPage() {
                 Decentralized Commerce
               </h1>
               <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                Stracel is a decentralized marketplace built on the Stacks blockchain,
+                Stracel is a decentralized marketplace built on the Celo blockchain,
                 enabling secure peer-to-peer transactions without intermediaries.
               </p>
             </motion.div>
@@ -107,26 +107,26 @@ export default function AboutPage() {
               className="text-center mb-12"
             >
               <h2 className="text-3xl font-bold text-black dark:text-white mb-4">
-                Built on Stacks
+                Built on Celo
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Leveraging Bitcoin's security with smart contract capabilities
+                Mobile-first blockchain with built-in stablecoin and G$ integration
               </p>
             </motion.div>
 
             <div className="space-y-8">
               {[
                 {
-                  title: 'Bitcoin Security',
-                  description: 'Stacks brings smart contracts to Bitcoin, inheriting its unmatched security and decentralization.'
+                  title: 'Celo Blockchain',
+                  description: 'Mobile-first blockchain with fast finality, low fees, and built-in stable value transfers.'
                 },
                 {
-                  title: 'Clarity Smart Contracts',
-                  description: 'Our contracts are written in Clarity, a decidable language that prevents common vulnerabilities.'
+                  title: 'Solidity Smart Contracts',
+                  description: 'Our contracts are written in Solidity 0.8 with OpenZeppelin standards for maximum security.'
                 },
                 {
-                  title: 'Proof of Transfer',
-                  description: 'Stacks uses PoX consensus to anchor to Bitcoin, providing the security of Bitcoin without its energy cost.'
+                  title: 'G$ & CELO Support',
+                  description: 'Dual-currency support for both CELO native tokens and GoodDollar (G$) stablecoins.'
                 },
                 {
                   title: 'Open Source',
