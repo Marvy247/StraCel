@@ -7,13 +7,16 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import TestnetBanner from '@/components/TestnetBanner';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Listing, CONTRACTS, MARKETPLACE_ABI, publicClient, formatCELO, formatAddress, getConnectedAddress, connectWallet, recordPurchase } from '@/lib/celo';
 import { useTxTracker } from '@/lib/transactionTracker';
-import { createWalletClient, custom } from 'viem';
+import { createNotification, saveNotifications, loadNotifications, NOTIF_TYPES } from '@/lib/notifications';
+import { createWalletClient, custom, parseEther } from 'viem';
 import { celo } from 'viem/chains';
 import { toast } from 'sonner';
-import { ArrowLeft, ShoppingCart, User, Clock, ExternalLink, Package, Info } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, User, Clock, ExternalLink, Package, Info, Edit3, Trash2, Save, X } from 'lucide-react';
 
 async function getWalletClient() {
   const eth = (window as any).ethereum;
@@ -29,6 +32,10 @@ export default function ListingDetailPage() {
   const [error, setError] = useState('');
   const [userAddress, setUserAddress] = useState('');
   const [purchasing, setPurchasing] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editPrice, setEditPrice] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [saving, setSaving] = useState(false);
   const { addTx } = useTxTracker();
 
   useEffect(() => {
@@ -58,6 +65,8 @@ export default function ListingDetailPage() {
         createdAt: l.createdAt,
         expiresAt: l.expiresAt,
       });
+      setEditPrice(formatCELO(l.price));
+      setEditDescription(l.description);
     } catch {
       setError('Listing not found');
     } finally {
@@ -105,6 +114,63 @@ export default function ListingDetailPage() {
       toast.error(e.shortMessage ?? 'Purchase failed');
     } finally {
       setPurchasing(false);
+    }
+  };
+
+  const startEditing = () => {
+    if (!listing) return;
+    setEditPrice(formatCELO(listing.price));
+    setEditDescription(listing.description);
+    setEditing(true);
+  };
+
+  const handleEdit = async () => {
+    if (!listing) return;
+    const addr = getConnectedAddress();
+    if (!addr) return;
+    setSaving(true);
+    try {
+      const wc = await getWalletClient();
+      const hash = await wc.writeContract({
+        address: CONTRACTS.CoreMarketPlace, abi: MARKETPLACE_ABI,
+        functionName: 'updateListing',
+        args: [BigInt(listingId), parseEther(editPrice), editDescription],
+        account: addr as `0x${string}`,
+      });
+      addTx(hash, `Edit listing #${listingId}`);
+      const ns = loadNotifications();
+      ns.unshift(createNotification(NOTIF_TYPES.LISTING, `Listing #${listingId} updated`));
+      saveNotifications(ns);
+      toast.success('Listing updated!');
+      setEditing(false);
+      loadListing();
+    } catch (e: any) {
+      toast.error(e.shortMessage ?? 'Failed to update listing');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!listing) return;
+    const addr = getConnectedAddress();
+    if (!addr) return;
+    try {
+      const wc = await getWalletClient();
+      const hash = await wc.writeContract({
+        address: CONTRACTS.CoreMarketPlace, abi: MARKETPLACE_ABI,
+        functionName: 'cancelListing',
+        args: [BigInt(listingId)],
+        account: addr as `0x${string}`,
+      });
+      addTx(hash, `Cancel listing #${listingId}`);
+      const ns = loadNotifications();
+      ns.unshift(createNotification(NOTIF_TYPES.LISTING, `Listing #${listingId} cancelled`));
+      saveNotifications(ns);
+      toast.success('Listing cancelled!');
+      loadListing();
+    } catch (e: any) {
+      toast.error(e.shortMessage ?? 'Failed to cancel');
     }
   };
 
@@ -215,8 +281,46 @@ export default function ListingDetailPage() {
               </Button>
             )}
 
-            {isActive && isOwner && (
-              <p className="text-center text-sm text-slate-400">You own this listing</p>
+            {isActive && isOwner && !editing && (
+              <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                <Button onClick={startEditing} variant="outline" className="flex-1">
+                  <Edit3 className="h-4 w-4 mr-2" /> Edit Listing
+                </Button>
+                <Button onClick={handleCancel} variant="destructive" className="flex-1">
+                  <Trash2 className="h-4 w-4 mr-2" /> Remove Listing
+                </Button>
+              </div>
+            )}
+
+            {isActive && isOwner && editing && (
+              <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 mb-4 space-y-4">
+                <div>
+                  <label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 block">Price ({currency})</label>
+                  <Input
+                    type="number"
+                    value={editPrice}
+                    onChange={(e) => setEditPrice(e.target.value)}
+                    min="0"
+                    step="0.001"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 block">Description</label>
+                  <Textarea
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleEdit} disabled={saving} className="flex-1 bg-gradient-to-r from-yellow-500 to-green-500 text-white border-0">
+                    <Save className="h-4 w-4 mr-2" />{saving ? 'Saving...' : 'Save Changes'}
+                  </Button>
+                  <Button onClick={() => setEditing(false)} variant="outline">
+                    <X className="h-4 w-4 mr-2" /> Cancel
+                  </Button>
+                </div>
+              </div>
             )}
 
             {!isActive && (

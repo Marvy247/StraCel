@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Listing, formatCELO, formatAddress } from '@/lib/celo';
-import { ShoppingCart, Clock, User } from 'lucide-react';
+import { ShoppingCart, Clock, User, Eye } from 'lucide-react';
 
 interface ListingCardProps {
   listing: Listing;
@@ -17,6 +18,7 @@ interface ListingCardProps {
 const STATUS_LABELS = ['Active', 'Sold', 'Cancelled'];
 
 export default function ListingCard({ listing, onPurchase, onCancel, isOwner }: ListingCardProps) {
+  const router = useRouter();
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
 
@@ -61,11 +63,16 @@ export default function ListingCard({ listing, onPurchase, onCancel, isOwner }: 
         </div>
       </CardContent>
 
-      <CardFooter className="pt-4">
+      <CardFooter className="pt-4 flex-col gap-2">
         {isOwner && isActive && (
-          <Button onClick={handleCancel} disabled={isCancelling} variant="destructive" className="w-full" size="sm">
-            {isCancelling ? 'Cancelling...' : 'Cancel Listing'}
-          </Button>
+          <div className="flex gap-2 w-full">
+            <Button onClick={() => router.push(`/listing/${listing.listingId}`)} variant="outline" size="sm" className="flex-1">
+              <Eye className="h-4 w-4 mr-1" /> Edit
+            </Button>
+            <Button onClick={handleCancel} disabled={isCancelling} variant="destructive" size="sm" className="flex-1">
+              {isCancelling ? 'Removing...' : 'Remove'}
+            </Button>
+          </div>
         )}
         {!isOwner && isActive && (
           <Button onClick={handlePurchase} disabled={isPurchasing}

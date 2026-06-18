@@ -55,6 +55,15 @@ export const MARKETPLACE_ABI = [
     outputs: [],
   },
   {
+    name: 'updateListing', type: 'function', stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'listingId', type: 'uint256' },
+      { name: 'newPrice', type: 'uint256' },
+      { name: 'newDescription', type: 'string' },
+    ],
+    outputs: [],
+  },
+  {
     name: 'getListing', type: 'function', stateMutability: 'view',
     inputs: [{ name: 'listingId', type: 'uint256' }],
     outputs: [{
