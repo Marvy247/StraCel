@@ -6,7 +6,7 @@ Post tasks, fund with CELO or G$, get work done. Funds held in escrow, 2.5% plat
 
 | Contract | Address |
 |---|---|
-| BountyBoard | `TBD — deploy then update` |
+| BountyBoard | `0xffFDf9B461Ef15a9a355FE2433368e043bdeb0C2` |
 | G$ Token | `0x62B8B11039FcfE5aB0C56E502b1C372A3d2a9c7A` |
 
 ## Deploy

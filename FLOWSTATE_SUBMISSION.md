@@ -29,7 +29,7 @@ G$ is a first-class reward currency alongside CELO. Posters fund bounties in G$,
 
 | Contract | Address |
 |---|---|
-| BountyBoard | `TBD — deploy to mainnet (see README)` |
+| BountyBoard | `0xffFDf9B461Ef15a9a355FE2433368e043bdeb0C2` |
 | G$ Token | `0x62B8B11039FcfE5aB0C56E502b1C372A3d2a9c7A` |
 
 ## Tech Stack
@@ -66,4 +66,4 @@ Solidity 0.8.24 + OpenZeppelin, Celo mainnet, Next.js + viem, G$ (GoodDollar).
 ## Links
 
 - GitHub: https://github.com/Marvy247/Tasky
-- Explorer: https://explorer.celo.org/mainnet/address/TBD
+- Explorer: https://explorer.celo.org/mainnet/address/0xffFDf9B461Ef15a9a355FE2433368e043bdeb0C2
