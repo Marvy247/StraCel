@@ -1,68 +1,69 @@
-# Stracel — Decentralized Marketplace on Celo
+# Tasky — Decentralized Bounties on Celo
 
-## What is Stracel?
+## What is Tasky?
 
-Stracel is a fully decentralized P2P marketplace on Celo. Anyone can list, buy, and sell goods using CELO or G$ — no middlemen, no fees, no censorship. Smart contracts handle payments directly between buyers and sellers, recorded on-chain.
+Tasky is a decentralized bounty platform on Celo where anyone can post tasks funded with CELO or G$ and workers can complete them for payment. Funds are held in escrow, released only when the poster approves the work.
 
 ## G$ Integration
 
-G$ is a first-class currency alongside CELO. Sellers price listings in G$, buyers can purchase with CELO or G$ (cross-currency). The frontend handles the full G$ approval flow (allowance check → approve → purchaseListingGD). This gives G$ real economic utility beyond holding.
+G$ is a first-class reward currency alongside CELO. Posters fund bounties in G$, workers earn G$ for completed work. The frontend handles the full ERC20 approval flow. A 0.5% referral bonus paid in the same currency incentivizes user acquisition. G$ flows through every part of the product — posting, earning, referring.
 
 ## How It Works
 
-1. **Connect** your Celo wallet (MetaMask or any EVM wallet)
-2. **List** an item — name, description, price (CELO or G$), duration
-3. **Buy** — payment goes directly to seller via smart contract. Track in My Orders with an on-chain verification link
-4. **Manage** — sellers can edit or remove listings anytime
+1. **Post** a bounty — title, description, reward (CELO or G$), deadline. Funds + 2.5% fee held in escrow.
+2. **Claim** — workers browse open bounties and claim one at a time.
+3. **Work & submit proof** — worker submits proof (IPFS hash, link, text).
+4. **Approve** — poster reviews and approves. Reward minus 0.5% referral bonus goes to worker. Fee stays in contract.
+5. **Cancel** — poster cancels anytime before completion; funds refunded in full.
+
+## Why This Isn't Trivial
+
+- **Escrow-based** — funds locked in contract, not just passed through
+- **Dual-currency** — CELO + G$ with full ERC20 approval flow
+- **Fee model** — 2.5% platform fee, sustainable business
+- **Referral system** — 0.5% bonus for referrers, drives growth
+- **Deadline enforcement** — bounties expire, posters can reclaim funds
+- **Complete UX** — browse, filter, post, claim, proof, approve — full lifecycle
 
 ## Smart Contracts (Celo Mainnet)
 
 | Contract | Address |
 |---|---|
-| CoreMarketPlace | `0x0Db0b61bd15B642305faDC91e3bBd6cD45ecf179` |
-| EscrowService | `0xc30e7A642E150d392FfC7D4AE56C87b549Ed3500` |
-| DisputeResolution | `0xA54B034b0cECD0877cc2d43fe3D1E1EB3A5cD561` |
-| UserProfile | `0x7DaE559f4acE0579121C22de722d1E97A6957069` |
+| BountyBoard | `TBD — deploy to mainnet (see README)` |
 | G$ Token | `0x62B8B11039FcfE5aB0C56E502b1C372A3d2a9c7A` |
 
 ## Tech Stack
 
-Solidity 0.8.24 + OpenZeppelin, Celo blockchain, Next.js + viem, G$ (GoodDollar).
+Solidity 0.8.24 + OpenZeppelin, Celo mainnet, Next.js + viem, G$ (GoodDollar).
 
-## What's the Current State?
+## Current State
 
-### Progress Made
+### Progress
 
-Stracel is live on Celo mainnet with 5 contracts deployed:
-
-- **CoreMarketPlace** — dual-currency listings + purchases, cross-currency support, edit/remove
-- **EscrowService** — trustless escrow for high-value transactions
-- **DisputeResolution** — community arbitration with 24h voting
-- **UserProfile** — on-chain registration and reputation scoring
-- **Frontend** — full Next.js UI: wallet connect, create/buy/cancel/edit listings, G$ approval flow, order history, transaction tracker (real-time polling), notifications, search, filter, sort, pagination, wallet balances (CELO + G$), gas estimation, "already bought" detection, confirm dialog with clear purchase breakdown
+- BountyBoard contract written, compiled, and ready for deployment
+- Frontend built with Vite + React + Tailwind v4 + Framer Motion
+- All pages functional: browse, post, detail (claim/proof/approve/cancel), my bounties
+- Wallet connect (MetaMask/Celo), Celo mainnet switching
+- G$ approval flow (allowance check → approve → post/earn)
+- Transaction tracking with real-time receipt polling
+- Fee calculation display, deadline estimation
 
 ### Milestones Completed
 
-- ✅ All contracts deployed to Celo mainnet
-- ✅ G$ integration: G$ listings, G$ purchases, cross-currency (buy G$ items with CELO), full approval flow
-- ✅ 12 active listings (CELO + G$) on mainnet — electronics, collectibles, home goods, Digital Art NFT
-- ✅ Complete frontend with all marketplace features
-- ✅ Edit/remove listings for sellers
-- ✅ Transaction tracker, notifications, order history with on-chain verification
-- ✅ 100-wallet activity system generating real on-chain transactions
+- ✅ BountyBoard.sol — escrow, dual-currency, fees, referral, deadlines
+- ✅ Frontend with all 4 pages + wallet + G$ approval
+- ✅ Platform fee (2.5%) + referral bonus (0.5%) embedded in contract
+- ✅ Clean, premium UI with glassmorphism, animations, responsive
 
 ### What's Next
 
-- Frontend deployment to a public URL
-- Mobile optimization for Celo's mobile-first base
-- Escrow integration in the CoreMarketPlace UI
-- Community growth and real user adoption
-
-## Why Stracel for GoodBuilders?
-
-G$ is a UBI token — Stracel gives it a place to be spent. Every G$-priced listing and cross-currency purchase drives real economic utility. We're building the commerce layer G$ needs.
+- Deploy to Celo mainnet and verify on explorer
+- Seed initial bounties with real rewards
+- Public frontend deployment (Vercel)
+- Mobile optimization
+- Community launch on Celo Signal / GoodDollar channels
 
 ## Links
 
-- GitHub: https://github.com/Marvy247/StraCel
-- Explorer: https://explorer.celo.org/mainnet/address/0x0Db0b61bd15B642305faDC91e3bBd6cD45ecf179
+- GitHub: https://github.com/Marvy247/Tasky
+- Explorer: https://explorer.celo.org/mainnet/address/TBD
